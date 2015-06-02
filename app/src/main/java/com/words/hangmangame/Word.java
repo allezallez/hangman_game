@@ -58,7 +58,7 @@ public class Word implements Comparable<Word> {
         this.word = word.substring(0, index) + letter + word.substring(index+1);
     }
 
-    public int compareTo( Word other) {
+    public int compareTo(Word other) {
         if ( this.getPosterior() > other.getPosterior() ) return -1;
         if ( this.getPosterior() == other.getPosterior() ) return 0;
         return 1;
