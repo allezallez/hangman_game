@@ -30,8 +30,8 @@ public class Word implements Comparable<Word> {
         return word.charAt(index);
     }
 
-    public void setWord(String new_word) {
-        this.word = new_word;
+    public void setWord(String word) {
+        this.word = word;
     }
 
     public String getWord() {
@@ -59,8 +59,8 @@ public class Word implements Comparable<Word> {
     }
 
     public int compareTo(Word other) {
-        if ( this.getPosterior() > other.getPosterior() ) return -1;
-        if ( this.getPosterior() == other.getPosterior() ) return 0;
+        if (this.getPosterior() > other.getPosterior()) return -1;
+        if (this.getPosterior() == other.getPosterior()) return 0;
         return 1;
     }
 }

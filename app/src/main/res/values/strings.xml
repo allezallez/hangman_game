@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">HangmanGame</string>
 
-    <string name="hello_world">Hello world!</string>
+    <string name="word_length_question">How long is your word?</string>
     <string name="action_settings">Settings</string>
+    <string name="go_button">Play!</string>
+    <string name="title_activity_hangman_game">HangmanGameActivity</string>
+
+    <string name="game_title">The game happens here</string>
 </resources>
