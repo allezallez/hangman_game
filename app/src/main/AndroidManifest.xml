@@ -20,6 +20,10 @@
             android:name=".HangmanGameActivity"
             android:label="@string/title_activity_hangman_game" >
         </activity>
+        <activity
+            android:name=".AtWhatLettersActivity"
+            android:label="@string/title_activity_at_what_letters" >
+        </activity>
     </application>
 
 </manifest>

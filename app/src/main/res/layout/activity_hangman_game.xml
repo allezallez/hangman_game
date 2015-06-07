@@ -9,4 +9,32 @@
     <TextView android:text="@string/game_title" android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <TextView
+        android:id="@+id/current_word"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="20dp"
+        android:text="@string/current_word_default" />
+
+    <TextView
+        android:id="@+id/first_guess"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="50dp"
+        android:text="@string/first_guess_default" />
+
+    <Button
+        android:id="@+id/yes_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/yes_button"
+        android:layout_marginTop="100dp"/>
+
+    <Button
+        android:id="@+id/no_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/no_button"
+        android:layout_marginTop="150dp"/>
+
 </RelativeLayout>

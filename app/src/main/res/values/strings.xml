@@ -6,5 +6,16 @@
     <string name="go_button">Play!</string>
     <string name="title_activity_hangman_game">HangmanGameActivity</string>
 
-    <string name="game_title">The game happens here</string>
+    <string name="yes">Yesss</string>
+    <string name="no">Nooo</string>
+
+    <string name="game_title">Current word:</string>
+    <string name="current_word_default">default</string>
+    <string name="first_guess_default">Does your word contain E?</string>
+
+    <string name="yes_button">Noooo</string>
+    <string name="no_button">Yessss</string>
+    <string name="title_activity_at_what_letters">AtWhatLettersActivity</string>
+
+    <string name="hello_world">Hello world!</string>
 </resources>

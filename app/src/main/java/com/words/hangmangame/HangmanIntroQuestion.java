@@ -13,6 +13,8 @@ import android.widget.EditText;
 
 public class HangmanIntroQuestion extends AppCompatActivity {
 
+  private static final int MAX_WORD_LENGTH = 34;
+
   private EditText numberOfLetters;
   private Button goButton;
 
