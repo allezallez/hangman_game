@@ -26,6 +26,8 @@ public class HangmanGameActivity extends AppCompatActivity {
   private String partialWord;
   private final ArrayList<Character> guesses = new ArrayList<>();
   private final ArrayList<Word> vocabulary = new ArrayList<>();
+  private boolean[] positions;
+  private char lastGuess;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -39,14 +41,34 @@ public class HangmanGameActivity extends AppCompatActivity {
     yesButton = (Button) findViewById(R.id.yes_button);
     noButton = (Button) findViewById(R.id.no_button);
 
-    partialWord = getBlankWord(intent.getIntExtra("number", 0));
-    currentWord.setText(partialWord);
-    wordLength = partialWord.length();
-    
-    System.out.println(wordLength);
-    System.out.println(mostCommonLetter(wordLength));
+    positions = intent.getBooleanArrayExtra("positions");
+    lastGuess = intent.getCharExtra("last_guess", ' ');
+    wordLength = intent.getIntExtra("word_length", 34);
 
-    firstGuess.setText("Does your word contain " + mostCommonLetter(wordLength));
+    if (lastGuess == ' ') {
+      partialWord = getBlankWord(wordLength);
+    } else {
+      partialWord = intent.getStringExtra("the_word");
+    }
+
+    wordLength = partialWord.length();
+
+    int i = 0;
+    for (boolean position : positions) {
+      if (position) {
+        partialWord = partialWord.substring(0,i) + lastGuess + partialWord.substring(i+1);
+      }
+      i++;
+    }
+
+    if (lastGuess == ' ') {
+      firstGuess.setText("Does your word contain " + mostCommonLetter(wordLength));
+      lastGuess = mostCommonLetter(wordLength);
+    } else {
+      currentWord.setText(partialWord);
+      firstGuess.setText("Does your word contain " + "CALCULATE ME!");
+      lastGuess = 'Z';
+    }
 
     yesButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View view) {
@@ -77,6 +99,12 @@ public class HangmanGameActivity extends AppCompatActivity {
       System.out.println(e);
     }
     System.out.println(vocabulary.size());
+
+    startActivity(new Intent(this, AtWhatLettersActivity.class)
+        .putExtra("word_length", wordLength)
+        .putExtra("the_word", partialWord)
+        .putExtra("last_guess", lastGuess)
+    );
   }
 
   @Override

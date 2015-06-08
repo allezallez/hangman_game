@@ -17,5 +17,5 @@
     <string name="no_button">Yessss</string>
     <string name="title_activity_at_what_letters">AtWhatLettersActivity</string>
 
-    <string name="hello_world">Hello world!</string>
+    <string name="at_what_letters">At what letters? Check all that apply.</string>
 </resources>

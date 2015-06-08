@@ -6,7 +6,112 @@
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context="com.words.hangmangame.AtWhatLettersActivity">
 
-    <TextView android:text="@string/hello_world" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <TextView
+        android:text="@string/at_what_letters"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp" >
+        <RadioButton android:id="@+id/radio_1"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="1"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/radio_2"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="2"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/radio_3"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="3"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/radio_4"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="4"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/radio_5"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="5"
+            android:onClick="onRadioButtonClicked"/>
+    </LinearLayout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="60dp" >
+        <RadioButton android:id="@+id/radio_6"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="6"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/radio_7"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="7"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/radio_8"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="8"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/radio_9"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="9"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/radio_10"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="10"
+            android:onClick="onRadioButtonClicked"/>
+    </LinearLayout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="100dp" >
+        <RadioButton android:id="@+id/radio_11"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="11"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/radio_12"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="12"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/radio_13"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="13"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/radio_14"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="14"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/radio_15"
+            android:layout_width="wrap_content"
+            android:layout_height="25dp"
+            android:text="15"
+            android:onClick="onRadioButtonClicked"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/done_button"
+        android:layout_height="40dp"
+        android:layout_width="200dp"
+        android:text="Done."
+        android:layout_marginTop="190dp"/>
 
 </RelativeLayout>

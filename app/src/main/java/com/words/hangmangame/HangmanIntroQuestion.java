@@ -15,14 +15,14 @@ public class HangmanIntroQuestion extends AppCompatActivity {
 
   private static final int MAX_WORD_LENGTH = 34;
 
-  private EditText numberOfLetters;
+  private EditText wordLength;
   private Button goButton;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_hangman_intro_question);
-    numberOfLetters = (EditText) findViewById(R.id.number_of_letters);
+    wordLength = (EditText) findViewById(R.id.number_of_letters);
     goButton = (Button) findViewById(R.id.go_button);
 
     // Setup event handlers
@@ -30,15 +30,15 @@ public class HangmanIntroQuestion extends AppCompatActivity {
       public void onClick(View view) {
         // "Play!" button:
         System.out.println("there");
-        switchToGame(Integer.parseInt(numberOfLetters.getText().toString()));
+        switchToGame(Integer.parseInt(wordLength.getText().toString()));
       }
     });
-    numberOfLetters.setOnKeyListener(new View.OnKeyListener() {
+    wordLength.setOnKeyListener(new View.OnKeyListener() {
       public boolean onKey(View view, int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
           // keyboard enter button:
           System.out.println("here");
-          switchToGame(Integer.parseInt(numberOfLetters.getText().toString()));
+          switchToGame(Integer.parseInt(wordLength.getText().toString()));
           return true;
         }
         return false;
@@ -48,7 +48,8 @@ public class HangmanIntroQuestion extends AppCompatActivity {
 
   public void switchToGame(int numberOfLetters) {
     Intent intent = new Intent(this, HangmanGameActivity.class);
-    intent.putExtra("number", numberOfLetters);
+    intent.putExtra("word_length", numberOfLetters);
+    intent.putExtra("positions", new boolean[numberOfLetters]);
     startActivity(intent);
   }
 
