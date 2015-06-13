@@ -10,11 +10,11 @@
     <string name="no">Nooo</string>
 
     <string name="game_title">Current word:</string>
-    <string name="current_word_default">default</string>
+    <string name="current_word_default">  </string>
     <string name="first_guess_default">Does your word contain E?</string>
 
-    <string name="yes_button">Noooo</string>
-    <string name="no_button">Yessss</string>
+    <string name="yes_button">Yessss</string>
+    <string name="no_button">Noooo</string>
     <string name="title_activity_at_what_letters">AtWhatLettersActivity</string>
 
     <string name="at_what_letters">At what letters? Check all that apply.</string>

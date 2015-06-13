@@ -10,29 +10,33 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 
+import java.util.ArrayList;
 
 public class AtWhatLettersActivity extends AppCompatActivity {
 
   private RadioButton[] letter_position_buttons = new RadioButton[15];
   private Button doneButton;
 
+  private ArrayList<Word> vocabulary = new ArrayList<>();
   private boolean[] positions;
-  private int wordLength;
   private String partialWord;
   private char lastGuess;
+  private String guesses;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+    System.out.println("AtWhatLetters onCreate");
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_at_what_letters);
     Intent intent = getIntent();
 
-    wordLength = intent.getIntExtra("word_length", 34);
     partialWord = intent.getStringExtra("the_word");
     lastGuess = intent.getCharExtra("last_guess", '?');
+    guesses = intent.getStringExtra("guesses");
+
     positions = new boolean[partialWord.length()];
 
-    for (int i = 0; i < wordLength; i++) {
+    for (int i = 0; i < partialWord.length(); i++) {
       final int j = i + 1;
       int id = getResources().getIdentifier("radio_" + j, "id", getPackageName());
       letter_position_buttons[i] = (RadioButton) findViewById(id);
@@ -44,7 +48,7 @@ public class AtWhatLettersActivity extends AppCompatActivity {
       });
     }
 
-    for (int i = wordLength; i < 15; i++) {
+    for (int i = partialWord.length(); i < 15; i++) {
       final int j = i + 1;
       int id = getResources().getIdentifier("radio_" + j, "id", getPackageName());
       letter_position_buttons[i] = (RadioButton) findViewById(id);
@@ -55,11 +59,18 @@ public class AtWhatLettersActivity extends AppCompatActivity {
     doneButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        Intent intent = new Intent(finalThis, HangmanGameActivity.class);
-        intent.putExtra("positions", positions)
-            .putExtra("word_length", wordLength)
+
+        int i = 0;
+        for (boolean position : positions) {
+          if (position) {
+            partialWord = partialWord.substring(0,i) + lastGuess + partialWord.substring(i+1);
+          }
+          i++;
+        }
+        Intent intent = new Intent(finalThis, HangmanGameActivity.class)
             .putExtra("the_word", partialWord)
-            .putExtra("last_guess", lastGuess);
+            .putExtra("last_guess", ' ')
+            .putExtra("guesses", guesses);
         startActivity(intent);
       }
     });

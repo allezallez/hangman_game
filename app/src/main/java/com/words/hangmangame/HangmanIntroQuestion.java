@@ -3,6 +3,7 @@ package com.words.hangmangame;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -10,10 +11,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.util.ArrayList;
+
 
 public class HangmanIntroQuestion extends AppCompatActivity {
-
-  private static final int MAX_WORD_LENGTH = 34;
 
   private EditText wordLength;
   private Button goButton;
@@ -25,20 +26,18 @@ public class HangmanIntroQuestion extends AppCompatActivity {
     wordLength = (EditText) findViewById(R.id.number_of_letters);
     goButton = (Button) findViewById(R.id.go_button);
 
+    HangmanDataHolder.vocab = new ArrayList<>();
+
     // Setup event handlers
     goButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View view) {
-        // "Play!" button:
-        System.out.println("there");
-        switchToGame(Integer.parseInt(wordLength.getText().toString()));
+        switchToGame(wordLength);
       }
     });
     wordLength.setOnKeyListener(new View.OnKeyListener() {
       public boolean onKey(View view, int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
-          // keyboard enter button:
-          System.out.println("here");
-          switchToGame(Integer.parseInt(wordLength.getText().toString()));
+          switchToGame(wordLength);
           return true;
         }
         return false;
@@ -46,11 +45,13 @@ public class HangmanIntroQuestion extends AppCompatActivity {
     });
   }
 
-  public void switchToGame(int numberOfLetters) {
-    Intent intent = new Intent(this, HangmanGameActivity.class);
-    intent.putExtra("word_length", numberOfLetters);
-    intent.putExtra("positions", new boolean[numberOfLetters]);
-    startActivity(intent);
+  public void switchToGame(EditText numberOfLettersEditable) {
+    int numberOfLetters = Integer.parseInt(numberOfLettersEditable.getText().toString());
+    startActivity(new Intent(this, HangmanGameActivity.class)
+        .putExtra("last_guess", mostCommonLetter(numberOfLetters))
+        .putExtra("the_word", getBlankWord(numberOfLetters))
+        .putExtra("guesses", "")
+        .putParcelableArrayListExtra("vocab", new ArrayList<Word>()));
   }
 
   @Override
@@ -75,9 +76,15 @@ public class HangmanIntroQuestion extends AppCompatActivity {
     return super.onOptionsItemSelected(item);
   }
 
-  @Override
-  protected void onPause () {
-    super.onPause();
-    System.out.println("wtf");
+  private static String getBlankWord(int length) {
+    String blank = "";
+    for (int i = 0; i < length; i++) {
+      blank += ' ';
+    }
+    return blank;
+  }
+
+  private static char mostCommonLetter(int length) {
+    return (length < 11) ? 'E' : 'I';
   }
 }

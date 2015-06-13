@@ -1,6 +1,9 @@
 package com.words.hangmangame;
 
-public class Word implements Comparable<Word> {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Word implements Comparable<Word>, Parcelable {
 
   private int count;
   private double probability;
@@ -58,4 +61,36 @@ public class Word implements Comparable<Word> {
     if (this.getPosterior() == other.getPosterior()) return 0;
     return 1;
   }
+
+
+  protected Word(Parcel in) {
+    count = in.readInt();
+    probability = in.readDouble();
+    word = in.readString();
+  }
+
+  @Override
+  public int describeContents() {
+    return 0;
+  }
+
+  @Override
+  public void writeToParcel(Parcel dest, int flags) {
+    dest.writeInt(count);
+    dest.writeDouble(probability);
+    dest.writeString(word);
+  }
+
+  @SuppressWarnings("unused")
+  public static final Parcelable.Creator<Word> CREATOR = new Parcelable.Creator<Word>() {
+    @Override
+    public Word createFromParcel(Parcel in) {
+      return new Word(in);
+    }
+
+    @Override
+    public Word[] newArray(int size) {
+      return new Word[size];
+    }
+  };
 }
