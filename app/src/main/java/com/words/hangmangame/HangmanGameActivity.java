@@ -15,10 +15,11 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.TreeSet;
 
 
 public class HangmanGameActivity extends AppCompatActivity {
+
+  private static final int NUMBER_OF_WORDS = 5;
 
   TextView currentWordDisplay;
   TextView guessQuestion;
@@ -26,37 +27,31 @@ public class HangmanGameActivity extends AppCompatActivity {
   private Button noButton;
 
   private String partialWord;
-  private String guesses;
   private char guess;
   private boolean isFirstRound;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    System.out.println("topOfOnCreate");
-    super.onCreate(Bundle.EMPTY);
+    super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_hangman_game);
+    Intent intent = getIntent();
 
     currentWordDisplay = (TextView) findViewById(R.id.current_word);
     guessQuestion = (TextView) findViewById(R.id.first_guess);
     yesButton = (Button) findViewById(R.id.yes_button);
     noButton = (Button) findViewById(R.id.no_button);
 
-    Intent intent = getIntent();
-    partialWord = intent.getStringExtra("the_word");
-    guess = intent.getCharExtra("last_guess", ' ');
-    guesses = intent.getStringExtra("guesses");
-    isFirstRound = guess != ' ';
+    partialWord = intent.getStringExtra("partial_word");
+    isFirstRound = intent.getBooleanExtra("is_first_round", false);
 
-    if (isFirstRound) {
-      guessQuestion.setText("Does your word contain " + guess);
-    } else {
-      currentWordDisplay.setText(partialWord);
-      guess = choose(guesses, partialWord);
-      guessQuestion.setText("Does your word contain " + guess);
-    }
-    guesses = guesses + guess;
+    guess = isFirstRound
+        ? mostCommonLetter(partialWord.length())
+        : choose(partialWord);
 
-    System.out.println("guesses: " + guesses);
+    currentWordDisplay.setText(partialWord);
+    guessQuestion.setText("Does your word contain " + guess);
+    HangmanDataHolder.guesses.add(guess);
+    HangmanDataHolder.topWords.clear();
 
     yesButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View view) {
@@ -69,26 +64,28 @@ public class HangmanGameActivity extends AppCompatActivity {
         modifyDictionary(partialWord.length(), false, isFirstRound);
       }
     });
+
+    int i = 0;
+    for (Word word : HangmanDataHolder.topWords) {
+      if (i < NUMBER_OF_WORDS) {
+        ((TextView) findViewById(getResources().getIdentifier("word_" + i, "id", getPackageName())))
+            .setText(word.getWord());
+      }
+      i++;
+    }
   }
 
   private void modifyDictionary(int wordLength, boolean containsGuess, boolean firstRound) {
     System.out.println("containsGuess: " + containsGuess);
     if (firstRound) {
       createVocab(Boolean.toString(containsGuess) + Integer.toString(wordLength));
-      firstRound = false;
     }
 
-    if (containsGuess) {
-      startActivity(new Intent(this, AtWhatLettersActivity.class)
-          .putExtra("the_word", partialWord)
-          .putExtra("last_guess", guess)
-          .putExtra("guesses", guesses));
-    } else {
-      startActivity(new Intent(this, HangmanGameActivity.class)
-          .putExtra("the_word", partialWord)
-          .putExtra("last_guess", ' ')
-          .putExtra("guesses", guesses));
-    }
+    startActivity(new Intent(this, containsGuess
+            ? AtWhatLettersActivity.class
+            : HangmanGameActivity.class)
+        .putExtra("partial_word", partialWord)
+        .putExtra("last_guess", guess));
   }
 
   private void createVocab(String filename) {
@@ -131,15 +128,8 @@ public class HangmanGameActivity extends AppCompatActivity {
     return super.onOptionsItemSelected(item);
   }
 
-  public static char choose(String currentGuesses, String partial) {
-    ArrayList<Character> guesses = new ArrayList<>();
+  public static char choose(String partial) {
 
-    for (int i = 0; i < currentGuesses.length(); i++) {
-      guesses.add(currentGuesses.charAt(i));
-    }
-
-    TreeSet<Word> top_words = new TreeSet<Word>();
-    //compset holds letters with their probabilites
     Pair[] compset = new Pair[26];
 
     //temp variables
@@ -150,13 +140,13 @@ public class HangmanGameActivity extends AppCompatActivity {
 
     //init top_words with very unlikely blanks
     for (int i = 0; i < 5; i++)
-      top_words.add(new Word(" ", 0, ((double) i / (double) 999999999)));
+      HangmanDataHolder.topWords.add(new Word(" ", 0, ((double) i / (double) 999999999)));
 
     for (int i = 0; i < 26; i++) {    //for each letter in alphabet
       letter = (char) (i + 65);
 
       //predictive calculates probability of letter
-      prob = predictive(guesses, partial, letter, top_words, run_vocab);
+      prob = predictive(partial, letter, run_vocab);
       temp_pair = new Pair(prob, letter);   //pairs prob' with letter
       compset[i] = temp_pair;                 //stores in compset
 
@@ -166,7 +156,7 @@ public class HangmanGameActivity extends AppCompatActivity {
     }
 
     //output most likely words
-    for (Word it : top_words)
+    for (Word it : HangmanDataHolder.topWords)
       System.out.println(it.getWord() + ": " + it.getPosterior());
 
     //while sorting is over-kill, compset is only 26 letters long
@@ -183,10 +173,8 @@ public class HangmanGameActivity extends AppCompatActivity {
    *            run_vocab:  whether or not to run calc's on all words
    * */
   private static double predictive(
-      ArrayList<Character> guesses,
       String partial,
       char letter,
-      TreeSet<Word> top_words,
       boolean run_vocab) {
     System.out.println("In predictive: " + HangmanDataHolder.vocab.size());
     //temp variables
@@ -203,11 +191,11 @@ public class HangmanGameActivity extends AppCompatActivity {
     HashSet<String> tops = new HashSet<String>();
 
     if (run_vocab)                //if we are running calcs
-      for (Word tw : top_words)    //then store all current top words
+      for (Word tw : HangmanDataHolder.topWords)    //then store all current top words
         tops.add(tw.getWord());
 
     for (Word cw : HangmanDataHolder.vocab) {        //for every word in the vocab
-      if (compatible(cw, guesses, partial)) { //check compatible
+      if (compatible(cw, HangmanDataHolder.guesses, partial)) { //check compatible
         sum_count += cw.getCount();//add its count to the sum
         new_vocab.add(cw);        //add to new vocab
       }
@@ -226,10 +214,10 @@ public class HangmanGameActivity extends AppCompatActivity {
 
         //check if current word needs to be in top words
         if (!tops.contains(cw.getWord())) {
-          temp_word = top_words.last();
+          temp_word = HangmanDataHolder.topWords.last();
           if (post >= temp_word.getPosterior()) {
-            top_words.remove(temp_word);
-            top_words.add(cw);
+            HangmanDataHolder.topWords.remove(temp_word);
+            HangmanDataHolder.topWords.add(cw);
           }
         }
       }
@@ -266,5 +254,9 @@ public class HangmanGameActivity extends AppCompatActivity {
       }
     }
     return true;
+  }
+
+  private static char mostCommonLetter(int length) {
+    return (length < 11) ? 'E' : 'I';
   }
 }

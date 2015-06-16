@@ -21,7 +21,6 @@ public class AtWhatLettersActivity extends AppCompatActivity {
   private boolean[] positions;
   private String partialWord;
   private char lastGuess;
-  private String guesses;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -30,9 +29,8 @@ public class AtWhatLettersActivity extends AppCompatActivity {
     setContentView(R.layout.activity_at_what_letters);
     Intent intent = getIntent();
 
-    partialWord = intent.getStringExtra("the_word");
+    partialWord = intent.getStringExtra("partial_word");
     lastGuess = intent.getCharExtra("last_guess", '?');
-    guesses = intent.getStringExtra("guesses");
 
     positions = new boolean[partialWord.length()];
 
@@ -48,18 +46,19 @@ public class AtWhatLettersActivity extends AppCompatActivity {
       });
     }
 
-    for (int i = partialWord.length(); i < 15; i++) {
+    for (int i = 0; i < 15; i++) {
       final int j = i + 1;
       int id = getResources().getIdentifier("radio_" + j, "id", getPackageName());
       letter_position_buttons[i] = (RadioButton) findViewById(id);
-      letter_position_buttons[i].setVisibility(View.GONE);
+      if (i >= partialWord.length() || partialWord.charAt(i) != ' ') {
+        letter_position_buttons[i].setVisibility(View.GONE);
+      }
     }
     doneButton = (Button) findViewById(R.id.done_button);
     final AtWhatLettersActivity finalThis = this;
     doneButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-
         int i = 0;
         for (boolean position : positions) {
           if (position) {
@@ -67,11 +66,8 @@ public class AtWhatLettersActivity extends AppCompatActivity {
           }
           i++;
         }
-        Intent intent = new Intent(finalThis, HangmanGameActivity.class)
-            .putExtra("the_word", partialWord)
-            .putExtra("last_guess", ' ')
-            .putExtra("guesses", guesses);
-        startActivity(intent);
+        startActivity(new Intent(finalThis, HangmanGameActivity.class)
+            .putExtra("partial_word", partialWord));
       }
     });
   }

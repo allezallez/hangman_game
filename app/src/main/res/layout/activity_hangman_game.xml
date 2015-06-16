@@ -39,4 +39,39 @@
         android:text="@string/no_button"
         android:layout_marginTop="150dp"/>
 
+    <TextView
+        android:id="@+id/word_0"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="200dp"
+        android:text="@string/blank_word" />
+
+    <TextView
+        android:id="@+id/word_1"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="225dp"
+        android:text="@string/blank_word" />
+
+    <TextView
+        android:id="@+id/word_2"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="250dp"
+        android:text="@string/blank_word" />
+
+    <TextView
+        android:id="@+id/word_3"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="275dp"
+        android:text="@string/blank_word" />
+
+    <TextView
+        android:id="@+id/word_4"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="300dp"
+        android:text="@string/blank_word" />
+
 </RelativeLayout>
