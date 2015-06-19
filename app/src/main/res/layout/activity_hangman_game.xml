@@ -40,13 +40,6 @@
         android:layout_marginTop="150dp"/>
 
     <TextView
-        android:id="@+id/word_0"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginTop="200dp"
-        android:text="@string/blank_word" />
-
-    <TextView
         android:id="@+id/word_1"
         android:layout_width="match_parent"
         android:layout_height="50dp"
@@ -72,6 +65,13 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginTop="300dp"
+        android:text="@string/blank_word" />
+
+    <TextView
+        android:id="@+id/word_5"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="325dp"
         android:text="@string/blank_word" />
 
 </RelativeLayout>

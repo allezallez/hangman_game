@@ -1,7 +1,6 @@
 package com.words.hangmangame;
 
 import android.content.Intent;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -10,14 +9,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 
-import java.util.ArrayList;
-
 public class AtWhatLettersActivity extends AppCompatActivity {
 
   private RadioButton[] letter_position_buttons = new RadioButton[15];
   private Button doneButton;
-
-  private ArrayList<Word> vocabulary = new ArrayList<>();
   private boolean[] positions;
   private String partialWord;
   private char lastGuess;

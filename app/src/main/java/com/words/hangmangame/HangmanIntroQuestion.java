@@ -11,7 +11,8 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import java.util.ArrayList;
-import java.util.TreeSet;
+import java.util.HashMap;
+import java.util.TreeMap;
 
 
 public class HangmanIntroQuestion extends AppCompatActivity {
@@ -24,9 +25,9 @@ public class HangmanIntroQuestion extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_hangman_intro_question);
 
-    HangmanDataHolder.vocab = new ArrayList<>();
+    HangmanDataHolder.stlVocab = new HashMap<>();
     HangmanDataHolder.guesses = new ArrayList<>();
-    HangmanDataHolder.topWords = new TreeSet<>();
+    HangmanDataHolder.stlTopWords = new TreeMap<>();
 
     wordLengthExitText = (EditText) findViewById(R.id.number_of_letters);
     wordLengthExitText.setOnKeyListener(new View.OnKeyListener() {
@@ -75,7 +76,7 @@ public class HangmanIntroQuestion extends AppCompatActivity {
     return super.onOptionsItemSelected(item);
   }
 
-  private static String getBlankWord(int length) {
+  public static String getBlankWord(int length) {
     String blank = "";
     for (int i = 0; i < length; i++) {
       blank += ' ';
