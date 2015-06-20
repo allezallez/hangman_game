@@ -54,6 +54,7 @@ public class AtWhatLettersActivity extends AppCompatActivity {
     doneButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
+        doneButton.setVisibility(View.GONE);
         int i = 0;
         for (boolean position : positions) {
           if (position) {

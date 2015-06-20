@@ -85,12 +85,16 @@ public class HangmanGameActivity extends AppCompatActivity {
 
     yesButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View view) {
+        yesButton.setVisibility(View.GONE);
+        noButton.setVisibility(View.GONE);
         modifyDictionary(partialWord.length(), true, isFirstRound);
       }
     });
 
     noButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View view) {
+        yesButton.setVisibility(View.GONE);
+        noButton.setVisibility(View.GONE);
         modifyDictionary(partialWord.length(), false, isFirstRound);
       }
     });
