@@ -176,11 +176,9 @@ public class HangmanGameActivity extends AppCompatActivity {
     }
 
     return (sortingTree.get(sortingTree.lastKey()));
-
   }
 
   private static HashMap<Character, Long> predictive(String partial) {
-
     HashMap<Character, Long> toReturn = new HashMap<>();
     for (char letter = 'A'; letter <= 'Z'; letter++) {
       toReturn.put(letter, 0L);
