@@ -11,7 +11,9 @@ import android.widget.RadioButton;
 
 public class AtWhatLettersActivity extends AppCompatActivity {
 
-  private RadioButton[] letter_position_buttons = new RadioButton[15];
+  private static final int MAX_WORD_LENGTH = 34;
+
+  private RadioButton[] letter_position_buttons = new RadioButton[MAX_WORD_LENGTH];
   private Button doneButton;
   private boolean[] positions;
   private String partialWord;
@@ -33,15 +35,17 @@ public class AtWhatLettersActivity extends AppCompatActivity {
       final int j = i + 1;
       int id = getResources().getIdentifier("radio_" + j, "id", getPackageName());
       letter_position_buttons[i] = (RadioButton) findViewById(id);
+      final RadioButton button = (RadioButton) findViewById(id);
       letter_position_buttons[i].setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-          positions[j - 1] = true;
+          button.setChecked(!positions[j - 1]);
+          positions[j - 1] = !positions[j - 1];
         }
       });
     }
 
-    for (int i = 0; i < 15; i++) {
+    for (int i = 0; i < MAX_WORD_LENGTH; i++) {
       final int j = i + 1;
       int id = getResources().getIdentifier("radio_" + j, "id", getPackageName());
       letter_position_buttons[i] = (RadioButton) findViewById(id);

@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
@@ -17,6 +18,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 
 
 public class HangmanGameActivity extends AppCompatActivity {
@@ -121,21 +126,16 @@ public class HangmanGameActivity extends AppCompatActivity {
 
   private void createVocab(String filename) {
     long startTime = System.currentTimeMillis();
-    try {
-      BufferedReader br = new BufferedReader(new InputStreamReader(
-          getResources().openRawResource(getResources().getIdentifier(
-              filename,
-              "raw",
-              getPackageName())),
-          "UTF-8"));
-      while (br.ready()) {
-        String[] singleWordData = br.readLine().split("\\s+");
-        HangmanDataHolder.stlVocab.put(singleWordData[0], Integer.parseInt(singleWordData[1]));
-      }
-      br.close();
-    } catch (IOException e) {
-      System.out.println(e);
-    }
+
+    Kryo kryo = new Kryo();
+
+    Input input = new Input(getResources().openRawResource(getResources().getIdentifier(
+        filename,
+        "raw",
+        getPackageName())));
+    HangmanDataHolder.stlVocab = kryo.readObject(input, HashMap.class);
+    input.close();
+
     System.out.println("File read time: " + (System.currentTimeMillis() - startTime));
     System.out.println(HangmanDataHolder.stlVocab.size());
   }
