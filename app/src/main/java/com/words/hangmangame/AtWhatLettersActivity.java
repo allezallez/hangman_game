@@ -16,7 +16,6 @@ public class AtWhatLettersActivity extends AppCompatActivity {
   private RadioButton[] letter_position_buttons = new RadioButton[MAX_WORD_LENGTH];
   private Button doneButton;
   private boolean[] positions;
-  private String partialWord;
   private char lastGuess;
 
   @Override
@@ -26,12 +25,11 @@ public class AtWhatLettersActivity extends AppCompatActivity {
     setContentView(R.layout.activity_at_what_letters);
     Intent intent = getIntent();
 
-    partialWord = intent.getStringExtra("partial_word");
     lastGuess = intent.getCharExtra("last_guess", '?');
 
-    positions = new boolean[partialWord.length()];
+    positions = new boolean[HangmanDataHolder.partialWordStack.peek().length()];
 
-    for (int i = 0; i < partialWord.length(); i++) {
+    for (int i = 0; i < HangmanDataHolder.partialWordStack.peek().length(); i++) {
       final int j = i + 1;
       int id = getResources().getIdentifier("radio_" + j, "id", getPackageName());
       letter_position_buttons[i] = (RadioButton) findViewById(id);
@@ -49,7 +47,8 @@ public class AtWhatLettersActivity extends AppCompatActivity {
       final int j = i + 1;
       int id = getResources().getIdentifier("radio_" + j, "id", getPackageName());
       letter_position_buttons[i] = (RadioButton) findViewById(id);
-      if (i >= partialWord.length() || partialWord.charAt(i) != ' ') {
+      if (i >= HangmanDataHolder.partialWordStack.peek().length()
+          || HangmanDataHolder.partialWordStack.peek().charAt(i) != ' ') {
         letter_position_buttons[i].setVisibility(View.GONE);
       }
     }
@@ -58,16 +57,17 @@ public class AtWhatLettersActivity extends AppCompatActivity {
     doneButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View v) {
-        doneButton.setVisibility(View.GONE);
+//        doneButton.setVisibility(View.GONE);
+        String newWord = HangmanDataHolder.partialWordStack.peek();
         int i = 0;
         for (boolean position : positions) {
           if (position) {
-            partialWord = partialWord.substring(0,i) + lastGuess + partialWord.substring(i+1);
+            newWord = newWord.substring(0,i) + lastGuess + newWord.substring(i+1);
           }
           i++;
         }
-        startActivity(new Intent(finalThis, HangmanGameActivity.class)
-            .putExtra("partial_word", partialWord));
+        HangmanDataHolder.partialWordStack.push(newWord);
+        startActivity(new Intent(finalThis, HangmanGameActivity.class));
       }
     });
   }

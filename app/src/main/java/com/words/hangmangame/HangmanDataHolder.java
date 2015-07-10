@@ -1,11 +1,13 @@
 package com.words.hangmangame;
 
-import java.util.HashMap;
-import java.util.List;
+import java.util.Deque;
+import java.util.Map;
 import java.util.TreeMap;
 
 public class HangmanDataHolder {
-  public static List<Character> guesses;
+
   public static TreeMap<Integer, String> stlTopWords;
-  public static HashMap<String, Integer> stlVocab;
+  public static Deque<Map<String, Integer>> vocabularyStack;
+  public static Deque<Character> guessStack;
+  public static Deque<String> partialWordStack;
 }

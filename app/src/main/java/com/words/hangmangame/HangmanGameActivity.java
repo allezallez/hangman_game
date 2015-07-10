@@ -9,10 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -21,10 +18,20 @@ import java.util.TreeMap;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
 
 
 public class HangmanGameActivity extends AppCompatActivity {
+
+  @Override
+  public void onBackPressed() {
+    System.out.println("GOING BACK!!!");
+    System.out.println("Popping: " + HangmanDataHolder.vocabularyStack.pop().size());
+    System.out.println("Popping: " + HangmanDataHolder.guessStack.pop());
+    System.out.println("Popping: " + HangmanDataHolder.partialWordStack.pop());
+    System.out.println("Top Dictionary Size: " + HangmanDataHolder.vocabularyStack.peek().size());
+    System.out.println("Total guesses " + HangmanDataHolder.guessStack);
+    super.onBackPressed();
+  }
 
   private static final int NUMBER_OF_WORDS = 5;
 
@@ -35,7 +42,6 @@ public class HangmanGameActivity extends AppCompatActivity {
   private Button yesButton;
   private Button noButton;
 
-  private String partialWord;
   private char guess;
   private boolean isFirstRound;
 
@@ -50,7 +56,6 @@ public class HangmanGameActivity extends AppCompatActivity {
     yesButton = (Button) findViewById(R.id.yes_button);
     noButton = (Button) findViewById(R.id.no_button);
 
-    partialWord = intent.getStringExtra("partial_word");
     isFirstRound = intent.getBooleanExtra("is_first_round", false);
 
     long startTime = System.currentTimeMillis();
@@ -63,9 +68,16 @@ public class HangmanGameActivity extends AppCompatActivity {
       System.out.println(e);
     }
 
-    guess = isFirstRound ? mostCommonLetter(partialWord.length()) : choose(partialWord);
+    if (isFirstRound) {
+      guess = mostCommonLetter(HangmanDataHolder.partialWordStack.peek().length());
+    } else {
+      HangmanDataHolder.vocabularyStack.push(HangmanDataHolder.vocabularyStack.peek());
+      guess = choose(HangmanDataHolder.partialWordStack.peek());
+      System.out.println("Size of Vocab History: " + HangmanDataHolder.vocabularyStack.size());
+    }
 
-    if (HangmanDataHolder.stlVocab.isEmpty() && !isFirstRound) {
+//    if (HangmanDataHolder.stlVocab.isEmpty() && !isFirstRound) {
+    if (HangmanDataHolder.vocabularyStack.isEmpty() && !isFirstRound) {
       ((TextView) findViewById(getResources().getIdentifier("word_1", "id", getPackageName())))
           .setText("No words match this criteria!!!");
     } else {
@@ -82,25 +94,31 @@ public class HangmanGameActivity extends AppCompatActivity {
 
     System.out.println("Guess calculation time: " + (System.currentTimeMillis() - startTime));
     System.out.println("and guessed " + guess);
+    System.out.println("All Guesses: " + HangmanDataHolder.guessStack);
+    if (HangmanDataHolder.vocabularyStack != null
+        && HangmanDataHolder.vocabularyStack.peek() != null) {
+      System.out.println("Current vocab size: " + HangmanDataHolder.vocabularyStack.peek().size());
+    }
 
-    currentWordDisplay.setText(partialWord.replace(' ', '_'));
+    currentWordDisplay.setText(HangmanDataHolder.partialWordStack.peek().replace(' ', '_'));
     guessQuestion.setText("Does your word contain " + guess);
-    HangmanDataHolder.guesses.add(guess);
+    HangmanDataHolder.guessStack.push(guess);
     HangmanDataHolder.stlTopWords.clear();
 
     yesButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View view) {
-        yesButton.setVisibility(View.GONE);
-        noButton.setVisibility(View.GONE);
-        modifyDictionary(partialWord.length(), true, isFirstRound);
+//        yesButton.setVisibility(View.GONE);
+//        noButton.setVisibility(View.GONE);
+        modifyDictionary(HangmanDataHolder.partialWordStack.peek().length(), true, isFirstRound);
       }
     });
 
     noButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View view) {
-        yesButton.setVisibility(View.GONE);
-        noButton.setVisibility(View.GONE);
-        modifyDictionary(partialWord.length(), false, isFirstRound);
+        HangmanDataHolder.partialWordStack.push(HangmanDataHolder.partialWordStack.peek());
+//        yesButton.setVisibility(View.GONE);
+//        noButton.setVisibility(View.GONE);
+        modifyDictionary(HangmanDataHolder.partialWordStack.peek().length(), false, isFirstRound);
       }
     });
   }
@@ -120,7 +138,6 @@ public class HangmanGameActivity extends AppCompatActivity {
 
     startActivity(
         new Intent(this, containsGuess ? AtWhatLettersActivity.class : HangmanGameActivity.class)
-            .putExtra("partial_word", partialWord)
             .putExtra("last_guess", guess));
   }
 
@@ -133,33 +150,12 @@ public class HangmanGameActivity extends AppCompatActivity {
         filename,
         "raw",
         getPackageName())));
-    HangmanDataHolder.stlVocab = kryo.readObject(input, HashMap.class);
+//    HangmanDataHolder.stlVocab = kryo.readObject(input, HashMap.class);
+    HangmanDataHolder.vocabularyStack.push(kryo.readObject(input, HashMap.class));
     input.close();
 
     System.out.println("File read time: " + (System.currentTimeMillis() - startTime));
-    System.out.println(HangmanDataHolder.stlVocab.size());
-  }
-
-  @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-    // Inflate the menu; this adds items to the action bar if it is present.
-    getMenuInflater().inflate(R.menu.menu_hangman_game, menu);
-    return true;
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    // Handle action bar item clicks here. The action bar will
-    // automatically handle clicks on the Home/Up button, so long
-    // as you specify a parent activity in AndroidManifest.xml.
-    int id = item.getItemId();
-
-    //noinspection SimplifiableIfStatement
-    if (id == R.id.action_settings) {
-      return true;
-    }
-
-    return super.onOptionsItemSelected(item);
+    System.out.println(HangmanDataHolder.vocabularyStack.peek().size());
   }
 
   public static char choose(String partial) {
@@ -168,11 +164,11 @@ public class HangmanGameActivity extends AppCompatActivity {
 
     for (Character letter : lettersToProbabilities.keySet()) {
       sortingTree.put(lettersToProbabilities.get(letter), letter);
-      System.out.println(letter + ": " + lettersToProbabilities.get(letter));
+//      System.out.println(letter + ": " + lettersToProbabilities.get(letter));
     }
 
     for (Map.Entry<Integer, String> it : HangmanDataHolder.stlTopWords.entrySet()) {
-      System.out.println(it.getValue() + ": " + HangmanDataHolder.stlVocab.get(it.getValue()));
+      System.out.println(it.getValue() + ": " + HangmanDataHolder.vocabularyStack.peek().get(it.getValue()));
     }
 
     return (sortingTree.get(sortingTree.lastKey()));
@@ -184,13 +180,13 @@ public class HangmanGameActivity extends AppCompatActivity {
       toReturn.put(letter, 0L);
     }
 
-    for (Iterator<Map.Entry<String,Integer>> it = HangmanDataHolder.stlVocab.entrySet().iterator();
+    for (Iterator<Map.Entry<String,Integer>> it = HangmanDataHolder.vocabularyStack.peek().entrySet().iterator();
          it.hasNext();) {
       Map.Entry<String, Integer> word = it.next();
-      if (!partialCompatibleWithWord(word.getKey(), HangmanDataHolder.guesses, partial)) {
+      if (!partialCompatibleWithWord(word.getKey(), new ArrayList<>(HangmanDataHolder.guessStack), partial)) {
         it.remove();
       } else {
-        Integer probability = HangmanDataHolder.stlVocab.get(word.getKey());
+        Integer probability = HangmanDataHolder.vocabularyStack.peek().get(word.getKey());
 
         if (HangmanDataHolder.stlTopWords.size() >= NUMBER_OF_WORDS
             && probability >= HangmanDataHolder.stlTopWords.firstKey()) {
@@ -239,5 +235,27 @@ public class HangmanGameActivity extends AppCompatActivity {
 
   private static char mostCommonLetter(int length) {
     return (length < 11) ? 'E' : 'I';
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    // Handle action bar item clicks here. The action bar will
+    // automatically handle clicks on the Home/Up button, so long
+    // as you specify a parent activity in AndroidManifest.xml.
+    int id = item.getItemId();
+
+    //noinspection SimplifiableIfStatement
+    if (id == R.id.action_settings) {
+      return true;
+    }
+
+    return super.onOptionsItemSelected(item);
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    // Inflate the menu; this adds items to the action bar if it is present.
+    getMenuInflater().inflate(R.menu.menu_hangman_game, menu);
+    return true;
   }
 }

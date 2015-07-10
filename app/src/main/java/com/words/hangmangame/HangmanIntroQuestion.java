@@ -10,10 +10,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.ArrayDeque;
 import java.util.TreeMap;
-
 
 public class HangmanIntroQuestion extends AppCompatActivity {
 
@@ -25,9 +23,10 @@ public class HangmanIntroQuestion extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_hangman_intro_question);
 
-    HangmanDataHolder.stlVocab = new HashMap<>();
-    HangmanDataHolder.guesses = new ArrayList<>();
+    HangmanDataHolder.guessStack = new ArrayDeque<>();
     HangmanDataHolder.stlTopWords = new TreeMap<>();
+    HangmanDataHolder.vocabularyStack = new ArrayDeque<>();
+    HangmanDataHolder.partialWordStack = new ArrayDeque<>();
 
     wordLengthExitText = (EditText) findViewById(R.id.number_of_letters);
     wordLengthExitText.setOnKeyListener(new View.OnKeyListener() {
@@ -49,8 +48,8 @@ public class HangmanIntroQuestion extends AppCompatActivity {
   }
 
   public void switchToGame(String numberOfLettersString) {
+    HangmanDataHolder.partialWordStack.push(getBlankWord(Integer.parseInt(numberOfLettersString)));
     startActivity(new Intent(this, HangmanGameActivity.class)
-        .putExtra("partial_word", getBlankWord(Integer.parseInt(numberOfLettersString)))
         .putExtra("is_first_round", true));
   }
 
