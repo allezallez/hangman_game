@@ -7,7 +7,9 @@ import java.util.TreeMap;
 public class HangmanDataHolder {
 
   public static TreeMap<Integer, String> stlTopWords;
-  public static Deque<Map<String, Integer>> vocabularyStack;
-  public static Deque<Character> guessStack;
-  public static Deque<String> partialWordStack;
+
+//  public static Deque<Map<String, Integer>> vocabularyStack;
+//  public static Deque<Character> guessStack;
+//  public static Deque<String> partialWordStack;
+  public static Deque<HangmanGameState> stateStack;
 }

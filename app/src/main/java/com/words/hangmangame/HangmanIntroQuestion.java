@@ -11,6 +11,8 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
 import java.util.TreeMap;
 
 public class HangmanIntroQuestion extends AppCompatActivity {
@@ -23,16 +25,17 @@ public class HangmanIntroQuestion extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_hangman_intro_question);
 
-    HangmanDataHolder.guessStack = new ArrayDeque<>();
-    HangmanDataHolder.stlTopWords = new TreeMap<>();
-    HangmanDataHolder.vocabularyStack = new ArrayDeque<>();
-    HangmanDataHolder.partialWordStack = new ArrayDeque<>();
+    final HangmanGameState hangmanGameState = new HangmanGameState();
+
+    hangmanGameState.cumulativeGuesses = new ArrayList<>();
+    HangmanDataHolder.stateStack = new ArrayDeque<>();
+    HangmanDataHolder.stateStack.push(hangmanGameState);
 
     wordLengthExitText = (EditText) findViewById(R.id.number_of_letters);
     wordLengthExitText.setOnKeyListener(new View.OnKeyListener() {
       public boolean onKey(View view, int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN) {
-          switchToGame(wordLengthExitText.getText().toString());
+          switchToGame(wordLengthExitText.getText().toString(), hangmanGameState);
           return true;
         }
         return false;
@@ -42,13 +45,13 @@ public class HangmanIntroQuestion extends AppCompatActivity {
     goButton = (Button) findViewById(R.id.go_button);
     goButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View view) {
-        switchToGame(wordLengthExitText.getText().toString());
+        switchToGame(wordLengthExitText.getText().toString(), hangmanGameState);
       }
     });
   }
 
-  public void switchToGame(String numberOfLettersString) {
-    HangmanDataHolder.partialWordStack.push(getBlankWord(Integer.parseInt(numberOfLettersString)));
+  public void switchToGame(String numberOfLettersString, HangmanGameState state) {
+    state.partialWord = getBlankWord(Integer.parseInt(numberOfLettersString));
     startActivity(new Intent(this, HangmanGameActivity.class)
         .putExtra("is_first_round", true));
   }

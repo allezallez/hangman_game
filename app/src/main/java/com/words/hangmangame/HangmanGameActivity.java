@@ -25,11 +25,7 @@ public class HangmanGameActivity extends AppCompatActivity {
   @Override
   public void onBackPressed() {
     System.out.println("GOING BACK!!!");
-    System.out.println("Popping: " + HangmanDataHolder.vocabularyStack.pop().size());
-    System.out.println("Popping: " + HangmanDataHolder.guessStack.pop());
-    System.out.println("Popping: " + HangmanDataHolder.partialWordStack.pop());
-    System.out.println("Top Dictionary Size: " + HangmanDataHolder.vocabularyStack.peek().size());
-    System.out.println("Total guesses " + HangmanDataHolder.guessStack);
+    System.out.println("Popping: " + HangmanDataHolder.stateStack.pop().toString());
     super.onBackPressed();
   }
 
@@ -68,16 +64,17 @@ public class HangmanGameActivity extends AppCompatActivity {
       System.out.println(e);
     }
 
+    // assumed presence of vocab at this point:
+    final HangmanGameState hangmanGameState = HangmanDataHolder.stateStack.peek();
+
     if (isFirstRound) {
-      guess = mostCommonLetter(HangmanDataHolder.partialWordStack.peek().length());
+      hangmanGameState.cumulativeGuesses.add(
+          mostCommonLetter(HangmanDataHolder.stateStack.peek().partialWord.length()));
     } else {
-      HangmanDataHolder.vocabularyStack.push(HangmanDataHolder.vocabularyStack.peek());
-      guess = choose(HangmanDataHolder.partialWordStack.peek());
-      System.out.println("Size of Vocab History: " + HangmanDataHolder.vocabularyStack.size());
+      hangmanGameState.cumulativeGuesses.add(choose(hangmanGameState));
     }
 
-//    if (HangmanDataHolder.stlVocab.isEmpty() && !isFirstRound) {
-    if (HangmanDataHolder.vocabularyStack.isEmpty() && !isFirstRound) {
+    if (hangmanGameState.vocabulary.isEmpty() && !isFirstRound) {
       ((TextView) findViewById(getResources().getIdentifier("word_1", "id", getPackageName())))
           .setText("No words match this criteria!!!");
     } else {
@@ -94,31 +91,27 @@ public class HangmanGameActivity extends AppCompatActivity {
 
     System.out.println("Guess calculation time: " + (System.currentTimeMillis() - startTime));
     System.out.println("and guessed " + guess);
-    System.out.println("All Guesses: " + HangmanDataHolder.guessStack);
-    if (HangmanDataHolder.vocabularyStack != null
-        && HangmanDataHolder.vocabularyStack.peek() != null) {
-      System.out.println("Current vocab size: " + HangmanDataHolder.vocabularyStack.peek().size());
+    System.out.println("All Guesses: " + hangmanGameState.cumulativeGuesses);
+    if (hangmanGameState.vocabulary != null) {
+      System.out.println("Current vocab size: " + hangmanGameState.vocabulary.size());
     }
 
-    currentWordDisplay.setText(HangmanDataHolder.partialWordStack.peek().replace(' ', '_'));
+    currentWordDisplay.setText(hangmanGameState.partialWord.replace(' ', '_'));
     guessQuestion.setText("Does your word contain " + guess);
-    HangmanDataHolder.guessStack.push(guess);
+    hangmanGameState.cumulativeGuesses.add(guess);
     HangmanDataHolder.stlTopWords.clear();
 
     yesButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View view) {
-//        yesButton.setVisibility(View.GONE);
-//        noButton.setVisibility(View.GONE);
-        modifyDictionary(HangmanDataHolder.partialWordStack.peek().length(), true, isFirstRound);
+        modifyDictionary(hangmanGameState.partialWord.length(), true, isFirstRound);
       }
     });
 
     noButton.setOnClickListener(new View.OnClickListener() {
       public void onClick(View view) {
-        HangmanDataHolder.partialWordStack.push(HangmanDataHolder.partialWordStack.peek());
-//        yesButton.setVisibility(View.GONE);
-//        noButton.setVisibility(View.GONE);
-        modifyDictionary(HangmanDataHolder.partialWordStack.peek().length(), false, isFirstRound);
+        // change stack modification here
+//        HangmanDataHolder.partialWordStack.push(HangmanDataHolder.partialWordStack.peek());
+        modifyDictionary(hangmanGameState.partialWord.length(), false, isFirstRound);
       }
     });
   }
@@ -130,7 +123,7 @@ public class HangmanGameActivity extends AppCompatActivity {
     if (firstRound) {
       dataLoader = new Thread(new Runnable() {
         public void run() {
-          createVocab(Boolean.toString(containsGuess) + Integer.toString(wordLength));
+        createVocab(Boolean.toString(containsGuess) + Integer.toString(wordLength));
         }
       });
       dataLoader.start();
@@ -141,7 +134,7 @@ public class HangmanGameActivity extends AppCompatActivity {
             .putExtra("last_guess", guess));
   }
 
-  private void createVocab(String filename) {
+  private Map<String, Integer> createVocab(String filename) {
     long startTime = System.currentTimeMillis();
 
     Kryo kryo = new Kryo();
@@ -151,15 +144,16 @@ public class HangmanGameActivity extends AppCompatActivity {
         "raw",
         getPackageName())));
 //    HangmanDataHolder.stlVocab = kryo.readObject(input, HashMap.class);
-    HangmanDataHolder.vocabularyStack.push(kryo.readObject(input, HashMap.class));
+    Map<String, Integer> freshVocab = kryo.readObject(input, HashMap.class);
     input.close();
 
     System.out.println("File read time: " + (System.currentTimeMillis() - startTime));
-    System.out.println(HangmanDataHolder.vocabularyStack.peek().size());
+    System.out.println(freshVocab.size());
+    return freshVocab;
   }
 
-  public static char choose(String partial) {
-    HashMap<Character, Long> lettersToProbabilities = predictive(partial);
+  public static char choose(HangmanGameState state) {
+    HashMap<Character, Long> lettersToProbabilities = predictive(state);
     TreeMap<Long, Character> sortingTree = new TreeMap<>();
 
     for (Character letter : lettersToProbabilities.keySet()) {
@@ -168,25 +162,25 @@ public class HangmanGameActivity extends AppCompatActivity {
     }
 
     for (Map.Entry<Integer, String> it : HangmanDataHolder.stlTopWords.entrySet()) {
-      System.out.println(it.getValue() + ": " + HangmanDataHolder.vocabularyStack.peek().get(it.getValue()));
+      System.out.println(it.getValue() + ": " + state.vocabulary.get(it.getValue()));
     }
 
     return (sortingTree.get(sortingTree.lastKey()));
   }
 
-  private static HashMap<Character, Long> predictive(String partial) {
+  private static HashMap<Character, Long> predictive(HangmanGameState state) {
     HashMap<Character, Long> toReturn = new HashMap<>();
     for (char letter = 'A'; letter <= 'Z'; letter++) {
       toReturn.put(letter, 0L);
     }
 
-    for (Iterator<Map.Entry<String,Integer>> it = HangmanDataHolder.vocabularyStack.peek().entrySet().iterator();
+    for (Iterator<Map.Entry<String,Integer>> it = state.vocabulary.entrySet().iterator();
          it.hasNext();) {
       Map.Entry<String, Integer> word = it.next();
-      if (!partialCompatibleWithWord(word.getKey(), new ArrayList<>(HangmanDataHolder.guessStack), partial)) {
+      if (!partialCompatibleWithWord(word.getKey(), state.cumulativeGuesses, state.partialWord)) {
         it.remove();
       } else {
-        Integer probability = HangmanDataHolder.vocabularyStack.peek().get(word.getKey());
+        Integer probability = state.vocabulary.get(word.getKey());
 
         if (HangmanDataHolder.stlTopWords.size() >= NUMBER_OF_WORDS
             && probability >= HangmanDataHolder.stlTopWords.firstKey()) {
@@ -197,7 +191,7 @@ public class HangmanGameActivity extends AppCompatActivity {
         }
 
         for (char letter = 'A'; letter <= 'Z'; letter++) {
-          if (blanksCompatibleWithLetter(partial, word.getKey(), letter)) {
+          if (blanksCompatibleWithLetter(state.partialWord, word.getKey(), letter)) {
             toReturn.put(letter, toReturn.get(letter) + probability);
           }
         }

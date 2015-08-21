@@ -26,10 +26,11 @@ public class AtWhatLettersActivity extends AppCompatActivity {
     Intent intent = getIntent();
 
     lastGuess = intent.getCharExtra("last_guess", '?');
+    final HangmanGameState hangmanGameState = HangmanDataHolder.stateStack.peek();
 
-    positions = new boolean[HangmanDataHolder.partialWordStack.peek().length()];
+    positions = new boolean[hangmanGameState.partialWord.length()];
 
-    for (int i = 0; i < HangmanDataHolder.partialWordStack.peek().length(); i++) {
+    for (int i = 0; i < hangmanGameState.partialWord.length(); i++) {
       final int j = i + 1;
       int id = getResources().getIdentifier("radio_" + j, "id", getPackageName());
       letter_position_buttons[i] = (RadioButton) findViewById(id);
@@ -47,8 +48,8 @@ public class AtWhatLettersActivity extends AppCompatActivity {
       final int j = i + 1;
       int id = getResources().getIdentifier("radio_" + j, "id", getPackageName());
       letter_position_buttons[i] = (RadioButton) findViewById(id);
-      if (i >= HangmanDataHolder.partialWordStack.peek().length()
-          || HangmanDataHolder.partialWordStack.peek().charAt(i) != ' ') {
+      if (i >= hangmanGameState.partialWord.length()
+          || hangmanGameState.partialWord.charAt(i) != ' ') {
         letter_position_buttons[i].setVisibility(View.GONE);
       }
     }
@@ -58,7 +59,7 @@ public class AtWhatLettersActivity extends AppCompatActivity {
       @Override
       public void onClick(View v) {
 //        doneButton.setVisibility(View.GONE);
-        String newWord = HangmanDataHolder.partialWordStack.peek();
+        String newWord = hangmanGameState.partialWord;
         int i = 0;
         for (boolean position : positions) {
           if (position) {
@@ -66,7 +67,8 @@ public class AtWhatLettersActivity extends AppCompatActivity {
           }
           i++;
         }
-        HangmanDataHolder.partialWordStack.push(newWord);
+        // modify state stack here?
+//        hangmanGameState.partialWordStack.push(newWord);
         startActivity(new Intent(finalThis, HangmanGameActivity.class));
       }
     });
